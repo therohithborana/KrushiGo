@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroSoil Advisor - Login</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.18.0/firebase-auth.js"></script>
+  <script defer src="script.js"></script>
+</head>
+<body>
+  <nav class="bg-green-600 p-4">
+    <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <h1 class="text-white text-2xl font-bold">AgroSoil Advisor</h1>
+      <button id="toggle-auth" class="text-white hover:text-green-100">Sign up</button>
+    </div>
+  </nav>
+
+  <div class="auth-container" id="auth-container">
+    <h2 id="auth-title" class="text-2xl font-bold mb-6">Login to Your Account</h2>
+
+    <form id="auth-form" class="space-y-4">
+      <div id="name-field" class="space-y-2 hidden">
+        <label class="block text-sm font-medium text-gray-700">Full Name</label>
+        <input type="text" class="input-field" placeholder="Enter your full name" id="full-name" />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Email Address</label>
+        <input type="email" class="input-field" placeholder="Enter your email" id="email" required />
+      </div>
+
+      <div class="space-y-2">
+        <label class="block text-sm font-medium text-gray-700">Password</label>
+        <input type="password" class="input-field" placeholder="Enter your password" id="password" required />
+      </div>
+
+      <a href="dashboard.html" class="submit-btn" id="submit-btn">Login</button>
+    </form>
+
+    <div class="mt-4 text-center">
+      <button id="toggle-auth-secondary" class="text-green-600 hover:text-green-700">Don't have an account? Sign up</button>
+    </div>
+  </div>
+
+  <script>
+    // Your Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCHi1sFFcw567Iu9rDSrXOQURGdCVtn6E8",
+      authDomain: "krushigo.firebaseapp.com",
+      projectId: "krushigo",
+      storageBucket: "krushigo.appspot.com",
+      messagingSenderId: "175951065183",
+      appId: "1:175951065183:web:87c304a9a8f307ce5a6bea"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
+</body>
+</html>

@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Soil Test Booking</title>
+  <style>
+    /* Basic reset */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f8f9fa;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 600px;
+      width: 100%;
+      background-color: #fff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .title {
+      font-size: 24px;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .description {
+      color: #6c757d;
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+
+    .button, .form-button, .track-button {
+      background-color: #28a745;
+      color: #fff;
+      border: none;
+      padding: 0.75rem 1.5rem;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      display: block;
+      width: 100%;
+      text-align: center;
+    }
+
+    .button:hover, .form-button:hover, .track-button:hover {
+      background-color: #218838;
+    }
+
+    .alert, .tracking-stage, .condition-list {
+      color: #dc3545;
+      margin: 1rem 0;
+      padding: 1rem;
+      border-radius: 5px;
+      background-color: #f8d7da;
+    }
+
+    .tracking-stage {
+      display: flex;
+      align-items: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 0.5rem;
+      color: #333;
+    }
+
+    .form-group input, .form-group textarea {
+      width: 100%;
+      padding: 0.75rem;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      outline: none;
+    }
+
+    .tracking {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .tracking-circle {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      margin-right: 1rem;
+    }
+
+    .tracking-circle.completed {
+      background-color: #28a745;
+      color: white;
+    }
+
+    .tracking-circle.pending {
+      background-color: #e9ecef;
+      color: #6c757d;
+    }
+
+    .tracking-description {
+      color: #6c757d;
+    }
+
+  </style>
+</head>
+<body>
+
+<div class="container" id="container">
+  <!-- Initial stage with Book Now button -->
+  <div id="initial-stage">
+    <h1 class="title">Soil Test Booking</h1>
+    <p class="description">
+      Book a professional soil test to get accurate analysis of your soil quality.
+    </p>
+    <button class="button" onclick="showConditionsDialog()">Book Soil Test</button>
+  </div>
+
+  <!-- Conditions dialog -->
+  <div id="conditions-dialog" style="display: none;">
+    <h2 class="title">Soil Sampling Conditions</h2>
+    <div class="condition-list">
+      <p>Have these conditions been met?</p>
+      <ul>
+        <li>The soil sample should be taken at least 3 months after the application of manure.</li>
+        <li>The soil should be moist but not overly wet or dry at the time of sampling.</li>
+        <li>No soil sampling immediately after heavy rainfall.</li>
+      </ul>
+    </div>
+    <button class="button" onclick="handleConditionsResponse(true)">Yes, proceed to booking</button>
+    <button class="button" onclick="handleConditionsResponse(false)">No, conditions not met</button>
+  </div>
+
+  <!-- Error alert -->
+  <div id="error-alert" class="alert" style="display: none;">
+    Please fulfill the required conditions before booking a soil test.
+  </div>
+
+  <!-- Booking form -->
+  <div id="booking-form" style="display: none;">
+    <h2 class="title">Book Soil Test</h2>
+    <form onsubmit="submitBookingForm(event)">
+      <div class="form-group">
+        <label for="name">Full Name</label>
+        <input type="text" id="name" required>
+      </div>
+      <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input type="tel" id="phone" required>
+      </div>
+      <div class="form-group">
+        <label for="email">Email Address</label>
+        <input type="email" id="email" required>
+      </div>
+      <div class="form-group">
+        <label for="address">Address</label>
+        <textarea id="address" rows="3" required></textarea>
+      </div>
+      <div class="form-group">
+        <label for="crop">Crop Interest</label>
+        <input type="text" id="crop" required>
+      </div>
+      <button type="submit" class="form-button">Book Soil Test</button>
+    </form>
+  </div>
+
+  <!-- Confirmation stage -->
+  <div id="confirmation-stage" style="display: none;">
+    <h2 class="title">Booking Confirmed!</h2>
+    <p>Your soil test has been successfully booked. You will receive a confirmation email and SMS shortly.</p>
+    <button class="track-button" onclick="showTracking()">Track Status</button>
+  </div>
+
+  <!-- Tracking stage -->
+  <div id="tracking-stage" style="display: none;">
+    <h2 class="title">Track Soil Test Status</h2>
+    <div id="tracking-stages">
+      <!-- Tracking stages will be populated here -->
+    </div>
+  </div>
+</div>
+
+<script>
+  let currentStage = 'initial';
+  const trackingStages = [
+    'Test person appointed',
+    'Soil sample collected',
+    'Sample reached test center',
+    'Testing in process',
+    'Report generated'
+  ];
+
+  function showConditionsDialog() {
+    currentStage = 'conditions';
+    updateView();
+  }
+
+  function handleConditionsResponse(meetsConditions) {
+    if (meetsConditions) {
+      currentStage = 'form';
+    } else {
+      document.getElementById('error-alert').style.display = 'block';
+      setTimeout(() => document.getElementById('error-alert').style.display = 'none', 5000);
+      currentStage = 'initial';
+    }
+    updateView();
+  }
+
+  function submitBookingForm(event) {
+    event.preventDefault();
+    currentStage = 'confirmation';
+    updateView();
+  }
+
+  function showTracking() {
+    currentStage = 'tracking';
+    updateView();
+    populateTrackingStages();
+  }
+
+  function populateTrackingStages() {
+    const trackingContainer = document.getElementById('tracking-stages');
+    trackingContainer.innerHTML = '';
+    trackingStages.forEach((stage, index) => {
+      const stageDiv = document.createElement('div');
+      stageDiv.className = 'tracking-stage';
+      stageDiv.innerHTML = `
+        <div class="tracking-circle ${index === 0 ? 'completed' : 'pending'}">${index === 0 ? '✓' : index + 1}</div>
+        <div class="tracking-description">${stage}</div>
+      `;
+      trackingContainer.appendChild(stageDiv);
+    });
+  }
+
+  function updateView() {
+    document.getElementById('initial-stage').style.display = currentStage === 'initial' ? 'block' : 'none';
+    document.getElementById('conditions-dialog').style.display = currentStage === 'conditions' ? 'block' : 'none';
+    document.getElementById('booking-form').style.display = currentStage === 'form' ? 'block' : 'none';
+    document.getElementById('confirmation-stage').style.display = currentStage === 'confirmation' ? 'block' : 'none';
+    document.getElementById('tracking-stage').style.display = currentStage === 'tracking' ? 'block' : 'none';
+  }
+</script>
+
+
+<!-- booking.html (inside <script> tag) -->
+  <script>
+    function submitBookingForm(event) {
+      event.preventDefault();
+  
+      // Collect form data
+      const name = document.getElementById('name').value;
+      const phone = document.getElementById('phone').value;
+      const email = document.getElementById('email').value;
+      const address = document.getElementById('address').value;
+      const crop = document.getElementById('crop').value;
+  
+      // Send data to backend
+      fetch('/api/book', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ name, phone, email, address, crop }),
+      })
+        .then((response) => response.json())
+        .then((data) => {
+          if (data.message === 'Booking confirmed. Email sent!') {
+            alert('Booking confirmed! Check your email for details.');
+            currentStage = 'confirmation';
+            updateView();
+          }
+        })
+        .catch((error) => console.error('Error:', error));
+    }
+  </script>
+  
+
+</body>
+</html>
